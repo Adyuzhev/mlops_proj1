@@ -1,0 +1,11 @@
+split:
+  split_ratio: 0.3
+
+scaler:
+  chosen_scaler: "MinMaxScaler"
+
+train:
+  random_state: 42
+  penalty: "l2"
+  C: 1.0
+  fit_intercept: True

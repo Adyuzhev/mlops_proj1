@@ -1,0 +1,44 @@
+stages:
+  split:
+    cmd: python3 scripts/data_scripts/train_test_split.py data/raw/raw_data.csv
+    deps:
+    - data/raw/raw_data.csv
+    - scripts/data_scripts/train_test_split.py
+    params:
+    - split.split_ratio
+    outs:
+    - data/stage1
+  
+  normalization:
+    cmd: python3 scripts/data_scripts/normalization.py data/stage1/train.csv data/stage1/test.csv
+    deps:
+    - data/stage1/train.csv
+    - data/stage1/test.csv
+    - scripts/data_scripts/normalization.py
+    params:
+    - scaler.chosen_scaler
+    outs:
+    - data/stage2
+
+  train:
+    cmd: python3 scripts/model_scripts/data_train.py data/stage2/train.csv model.pkl
+    deps:
+    - data/stage2/train.csv
+    - scripts/model_scripts/data_train.py
+    params:
+    - train.random_state
+    - train.penalty
+    - train.C
+    - train.fit_intercept
+    outs:
+    - models/model.pkl
+
+  evaluate:
+    cmd: python3 scripts/model_scripts/evaluate.py data/stage2/test.csv models/model.pkl
+    deps:
+    - data/stage2/test.csv
+    - models/model.pkl
+    - scripts/model_scripts/evaluate.py
+    metrics:
+    - evaluate/score.json:
+        cache: false
